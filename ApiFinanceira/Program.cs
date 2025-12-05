@@ -8,8 +8,14 @@ builder.Configuration
 builder.Services.AddSingleton(provider =>
 {
     var config = builder.Configuration.GetSection("Supabase");
+    
     var url = config["Url"];
-    var key = config["ServiceKey"];
+    var key = config["AnonKey"]; 
+    
+    if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(key))
+    {
+        throw new Exception($"⚠️ ERRO: Configuração vazia! \nUrl: {url} \nKey (Anon): {key}");
+    }
 
     var options = new Supabase.SupabaseOptions
     {
@@ -18,7 +24,6 @@ builder.Services.AddSingleton(provider =>
     };
 
     var client = new Supabase.Client(url, key, options);
-
     client.InitializeAsync().Wait();
 
     return client;

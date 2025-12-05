@@ -17,6 +17,7 @@ public class ClientesController : ControllerBase
         _clienteService = clienteService;
     }
 
+    [HttpGet("listar-usuarios")]
     public async Task<IActionResult> ListarUsuarios()
     {
         var listar = await _clienteService.GetClientesAsync();
