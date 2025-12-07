@@ -23,5 +23,12 @@ public class ClientesController : ControllerBase
         var listar = await _clienteService.GetClientesAsync();
         return Ok(listar);
     }
+    
+    [HttpPost("criar-usuarios")]
+    public async Task<IActionResult> CriarUsuarios(string nome, string documento, string email)
+    {
+        var listar = await _clienteService.PostClientesAsync(nome, documento, email);
+        return Ok(listar);
+    }
 }
 

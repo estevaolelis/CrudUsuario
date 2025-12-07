@@ -1,5 +1,6 @@
 ﻿using ApiFinanceira.DTO.Clientes;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Supabase.Postgrest;
 
 namespace ApiFinanceira.Services
 {
@@ -9,6 +10,35 @@ namespace ApiFinanceira.Services
         public ClientesService(Supabase.Client supabase)
         {
             _supabase = supabase;
+        }
+
+        public async Task<ClientesDto> PostClientesAsync(string nome, string documento, string email)
+        {
+            var novoCliente = new clientes
+            {
+                nome = nome,
+                documento = documento,
+                email = email,
+                status = true,
+                data_criacao = DateTime.UtcNow
+            };
+            
+            var response = await _supabase .From<clientes>() .Insert(novoCliente, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
+            var clienteCriado = response.Models.FirstOrDefault();
+            
+            if (clienteCriado != null)
+            {
+                return new ClientesDto()
+                {
+                    id = clienteCriado.id,
+                    Nome = clienteCriado.nome,
+                    email = clienteCriado.email,
+                    status = clienteCriado.status,
+                    data_criacao = clienteCriado.data_criacao
+                };
+            }
+
+            return null;
         }
 
         public async Task<List<ClientesDto>> GetClientesAsync()

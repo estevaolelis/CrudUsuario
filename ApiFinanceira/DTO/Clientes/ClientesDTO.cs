@@ -7,5 +7,5 @@ public class ClientesDto
     public string documento { get; set; }
     public string email { get; set; }
     public bool status { get; set; }
-    public DateTime data_criacao { get; set; }
+    public DateTime? data_criacao { get; set; }
 }

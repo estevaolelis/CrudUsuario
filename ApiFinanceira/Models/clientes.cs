@@ -15,5 +15,5 @@ public class clientes : BaseModel
     [Column("status")]
     public bool status { get; set; }
     [Column("data_criacao")]
-    public DateTime data_criacao { get; set; }
+    public DateTime? data_criacao { get; set; }
 }
