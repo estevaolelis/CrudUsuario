@@ -1,3 +1,5 @@
+using ApiFinanceira.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
@@ -36,6 +38,8 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<ClientesService>();
 
 var app = builder.Build();
 
