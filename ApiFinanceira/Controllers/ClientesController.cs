@@ -15,9 +15,17 @@ public class ClientesController : ControllerBase
     }
 
     [HttpGet("listar-usuarios")]
-    public async Task<IActionResult> ListarUsuarios()
+    public async Task<IActionResult> ListarClientes()
     {
         var listar = await _clienteService.GetClientesAsync();
+        
+        return Ok(listar);
+    }
+
+    [HttpGet("listar-cliente-id")]
+    public async Task<IActionResult> ListarClientesId(int id)
+    {
+        var listar = await _clienteService.GetClientesByIdAsync(id);
         
         return Ok(listar);
     }
@@ -29,8 +37,8 @@ public class ClientesController : ControllerBase
         public string Email { get; set; }
     }
 
-    [HttpPost("criar-usuarios")]
-    public async Task<IActionResult> CriarUsuarios([FromBody] CriarClienteRequest request)
+    [HttpPost("criar-cliente")]
+    public async Task<IActionResult> CriarClientes([FromBody] CriarClienteRequest request)
     {
         if (request == null) return BadRequest();
         

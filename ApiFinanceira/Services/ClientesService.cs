@@ -36,5 +36,11 @@ namespace ApiFinanceira.Services
             
             return response.Models; 
         }
+
+        public async Task<clientes> GetClientesByIdAsync(int id)
+        {
+            var response = await _supabase.From<clientes>().Where(c => c.id == id).Get();
+            return response.Models.FirstOrDefault();
+        }
     }   
 }
