@@ -1,4 +1,4 @@
-# 🏦 Argentum API (ou o nome que você escolher)
+# Argentum API
 
 API RESTful para gestão financeira, desenvolvida com **.NET 10** e **Entity Framework Core**. O sistema gerencia clientes, contas bancárias e transações, incluindo funcionalidades de exportação de relatórios em Excel/CSV.
 
