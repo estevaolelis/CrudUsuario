@@ -1,18 +1,52 @@
-﻿namespace ApiFinanceira.Services;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using ApiFinanceira.Data;
+using ApiFinanceira.Models;
+using Microsoft.EntityFrameworkCore;
 
-public class ContaService
+namespace ApiFinanceira.Services
 {
-    private readonly Supabase.Client _supabase;
-
-    public ContaService(Supabase.Client supabase)
+    public class ContaService
     {
-        _supabase = supabase;
-    }
-    
-    public async Task<List<conta>> GetContasAsync()
-    {
-        var response = await _supabase.From<conta>().Get();
+        private readonly AppDbContext _context;
 
-        return response.Models;
+        public ContaService(AppDbContext context)
+        {
+            _context = context;
+        }
+        
+        public async Task<List<ApiFinanceira.Models.Conta>> GetContasAsync()
+        {
+            return await _context.Contas
+                .AsNoTracking()
+                .Include(c => c.Cliente)
+                .ToListAsync();
+        }
+        
+        public async Task<Conta> PostContaAsync(int usuarioId, string tipoConta, decimal saldoInicial)
+        {
+            var novaConta = new Conta
+            {
+                UsuarioId = usuarioId,
+                TipoConta = tipoConta,
+                Saldo = saldoInicial,
+                DataCriacao = DateTime.UtcNow
+            };
+
+            _context.Contas.Add(novaConta);
+            await _context.SaveChangesAsync();
+
+            return novaConta;
+        }
+
+        public async Task<List<Conta>> GetContasPorUsuarioAsync(int usuarioId)
+        {
+            return await _context.Contas
+                .AsNoTracking()
+                .Where(c => c.UsuarioId == usuarioId)
+                .ToListAsync();
+        }
     }
 }

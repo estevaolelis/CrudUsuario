@@ -1,91 +1,76 @@
-﻿using ApiFinanceira.DTO.Exportacao;
-using Supabase.Postgrest;
-using Supabase.Postgrest.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using ApiFinanceira.Data;
+using ApiFinanceira.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiFinanceira.Services
 {
     public class ClientesService
     {
-        private readonly Supabase.Client _supabase;
+        private readonly AppDbContext _context;
 
-        public ClientesService(Supabase.Client supabase)
+        public ClientesService(AppDbContext context)
         {
-            _supabase = supabase;
+            _context = context;
         }
         
-        public async Task<clientes> PostClientesAsync(string nome, string documento, string email)
+        public async Task<Cliente> PostClientesAsync(string nome, string documento, string email)
         {
-            var novoCliente = new clientes
+            var novoCliente = new Cliente
             {
-                nome = nome,
-                documento = documento,
-                email = email,
-                status = true,
-                data_criacao = DateTime.UtcNow
+                Nome = nome,
+                Documento = documento,
+                Email = email,
+                Status = true,
+                DataCriacao = DateTime.UtcNow
             };
             
-            var response = await _supabase
-                .From<clientes>()
-                .Insert(novoCliente, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
+            _context.Clientes.Add(novoCliente);
+            await _context.SaveChangesAsync();
             
-            return response.Models.FirstOrDefault();
+            return novoCliente;
         }
         
-        public async Task<List<clientes>> GetClientesAsync()
+        public async Task<List<Cliente>> GetClientesAsync()
         {
-            var response = await _supabase.From<clientes>().Where(c => c.status == true).Get();
-            
-            return response.Models; 
+            return await _context.Clientes
+                .AsNoTracking()
+                .Where(c => c.Status == true)
+                .ToListAsync();
         }
-
-        public async Task<clientes> GetClientesByIdAsync(int id)
+        
+        public async Task<Cliente?> GetClientesByIdAsync(int id)
         {
-            var response = await _supabase.From<clientes>().Where(c => c.id == id && c.status == true).Get();
-            return response.Models.FirstOrDefault();
+            return await _context.Clientes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == id && c.Status == true);
         }
-
-        public async Task<clientes> PutClientesAsync(int id, string nome, string documento, string email)
+        
+        public async Task<Cliente?> PutClientesAsync(int id, string nome, string documento, string email)
         {
-            var response = await _supabase.From<clientes>().Where(c => c.id == id)
-                .Set(c => c.nome, nome) 
-                .Set(c => c.documento, documento)
-                .Set(c => c.email, email)
-                .Update();;
-            
-            return response.Models.FirstOrDefault();
+            var cliente = await _context.Clientes.FindAsync(id);
+            if (cliente == null) return null;
+
+            cliente.Nome = nome;
+            cliente.Documento = documento;
+            cliente.Email = email;
+
+            await _context.SaveChangesAsync();
+            return cliente;
         }
 
         public async Task<bool> DeleteClientesAsync(int id)
         {
-            var cliente = await _supabase
-                .From<clientes>()
-                .Where(c => c.id == id)
-                .Single();
-            
+            var cliente = await _context.Clientes.FindAsync(id);
             if (cliente == null) return false;
             
-            await _supabase
-                .From<clientes>()
-                .Where(c => c.id == id)
-                .Set(c => c.status, false)
-                .Update();
+            cliente.Status = false;
+            await _context.SaveChangesAsync();
 
             return true;
-        }
-        
-        public async Task<ResultadoExportacao> ExportarClientesExcelAsync()
-        {
-            var response = await _supabase.From<clientes>().Get();
-            var dados = response.Models;
-            
-            var config = new List<CsvColunaConfiguracao<clientes>>
-            {
-                new() { Cabecalho = "Nome", Formatador = c => c.nome },
-                new() { Cabecalho = "Documento", Formatador = c => c.documento }
-            };
-            
-            var exportacaoService = new ExportacaoService();
-            return exportacaoService.ExportarPlanilha(dados, config, FormatoExportacao.xlsx);
         }
     }   
 }

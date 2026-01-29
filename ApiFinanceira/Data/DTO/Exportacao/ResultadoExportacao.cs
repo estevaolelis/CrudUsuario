@@ -1,4 +1,4 @@
-﻿namespace ApiFinanceira.DTO.Exportacao;
+﻿namespace ApiFinanceira.Data.DTO.Exportacao;
 
 public class ResultadoExportacao
 {

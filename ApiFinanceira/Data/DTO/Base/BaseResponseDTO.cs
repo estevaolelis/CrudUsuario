@@ -1,4 +1,4 @@
-﻿namespace ApiFinanceira.DTO.Base
+﻿namespace ApiFinanceira.Data.DTO.Base
 {
     public class BaseResponseDTO<T>
     {

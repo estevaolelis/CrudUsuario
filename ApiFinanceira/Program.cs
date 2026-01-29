@@ -1,4 +1,11 @@
+using System;
 using ApiFinanceira.Services;
+using ApiFinanceira.Data;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,31 +14,12 @@ builder.Configuration
     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-builder.Services.AddSingleton(provider =>
-{
-    var config = builder.Configuration.GetSection("Supabase");
-    
-    var url = config["Url"];
-    var key = config["AnonKey"]; 
-    
-    if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(key))
-    {
-        throw new Exception($"⚠️ ERRO: Configuração vazia! \nUrl: {url} \nKey (Anon): {key}");
-    }
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-    var options = new Supabase.SupabaseOptions
-    {
-        AutoConnectRealtime = true,
-        AutoRefreshToken = true
-    };
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-    var client = new Supabase.Client(url, key, options);
-    client.InitializeAsync().Wait();
-
-    return client;
-});
-
-// Add services to the container.
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddControllers();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
@@ -39,21 +27,19 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
     options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore; 
 });
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ClientesService>();
+builder.Services.AddScoped<ExportacaoService>();
+builder.Services.AddScoped<ContaService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // Gera o JSON do Swagger
     app.UseSwagger();
-    // Gera a Tela HTML interativa
     app.UseSwaggerUI();
 }
 
@@ -62,5 +48,14 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.Migrate();
+    }
+}
 
 app.Run();

@@ -1,8 +1,12 @@
-﻿using ClosedXML.Excel;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using ClosedXML.Excel;
 using Microsoft.VisualBasic.FileIO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
-using ApiFinanceira.DTO.Exportacao;
+using ApiFinanceira.Data.DTO.Exportacao;
 
 namespace ApiFinanceira.Services
 {

@@ -1,4 +1,4 @@
-﻿namespace ApiFinanceira.DTO.Clientes
+﻿namespace ApiFinanceira.Data.DTO.Clientes
 {
     public class ClientesDto
     {
