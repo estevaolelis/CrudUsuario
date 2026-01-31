@@ -1,15 +1,29 @@
-# 💰 CrudUsuario
+# Argentum API
 
-API em .NET Core integrada ao **Supabase** (PostgreSQL), utilizando **Newtonsoft.Json** para serialização.
+API RESTful para gestão financeira, desenvolvida com **.NET 10** e **Entity Framework Core**. O sistema gerencia clientes, contas bancárias e transações, incluindo funcionalidades de exportação de relatórios em Excel/CSV.
 
-## 🛠 Tecnologias
-* .NET 8 / C#
-* Supabase (Database & Auth)
-* Newtonsoft.Json
-* Swagger
+## 🚀 Funcionalidades
+
+* **Gestão de Clientes:** CRUD completo de clientes.
+* **Contas Bancárias:** Associação de contas a clientes com controle de saldo.
+* **Relatórios:** Exportação de dados para Excel (.xlsx) e CSV utilizando *ClosedXML*.
+* **Arquitetura:** Separação em Camadas (Controllers, Services, Models, Data).
+* **Documentação:** Interface interativa com Swagger UI.
+
+## 🛠 Tecnologias Utilizadas
+
+* **Linguagem:** C# (.NET 10)
+* **ORM:** Entity Framework Core
+* **Banco de Dados:** PostgreSQL (Hospedado no Neon.tech)
+* **Ferramentas:**
+    * *Newtonsoft.Json* (Serialização)
+    * *ClosedXML* (Manipulação de Excel)
+    * *Swagger/OpenAPI* (Documentação)
 
 ## ⚙️ Configuração
-Crie o arquivo `appsettings.json` na raiz com suas chaves:
+
+1. Clone o repositório.
+2. Crie um arquivo `appsettings.json` na raiz do projeto seguindo o modelo abaixo:
 
 ```json
 {
@@ -19,21 +33,8 @@ Crie o arquivo `appsettings.json` na raiz com suas chaves:
       "Microsoft.AspNetCore": "Warning"
     }
   },
-  "Supabase": {
-    "Url": "SUA_URL_DO_SUPABASE",
-    "Key": "SUA_KEY_ANON_DO_SUPABASE"
-  },
-  "AllowedHosts": "*"
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=SEU_HOST_NEON;Database=neondb;Username=SEU_USER;Password=SUA_SENHA;SSL Mode=Require;Trust Server Certificate=true"
+  }
 }
-```
-
-## ▶️ Como rodar
-### 1. Restaurar pacotes:
-```bash
-dotnet restore
-```
-### 2. Iniciar a API:
-```bash
-dotnet run
-```
-### 3. Acessar Documentação: Abra http://localhost:5090/swagger no navegador.
